@@ -1,5 +1,6 @@
 package dev.sunix.outbox.api;
 
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -9,6 +10,5 @@ import java.util.UUID;
 
 public record CreatePaymentRequest(
         @NotNull UUID accountId,
-        @NotNull @Positive BigDecimal amount,
+        @NotNull @Positive @Digits(integer = 17, fraction = 2) BigDecimal amount,
         @NotBlank @Pattern(regexp = "[A-Za-z]{3}") String currency) {}
-

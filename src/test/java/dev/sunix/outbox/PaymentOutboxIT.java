@@ -110,6 +110,20 @@ class PaymentOutboxIT {
     }
 
     @Test
+    void rejectsMoneyOutsideDatabasePrecisionBeforeOpeningTheCommand() throws Exception {
+        String request = """
+                {"accountId":"%s","amount":"1.001","currency":"EUR"}
+                """.formatted(UUID.randomUUID());
+
+        mvc.perform(post("/payments").header("Idempotency-Key", "invalid-money")
+                        .contentType("application/json").content(request))
+                .andExpect(status().isBadRequest());
+
+        assertThat(jdbc.queryForObject("select count(*) from payment", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from outbox_event", Integer.class)).isZero();
+    }
+
+    @Test
     void concurrentRetriesCreateOnePaymentAndOneEvent() throws Exception {
         UUID accountId = UUID.randomUUID();
         var request = new CreatePaymentRequest(accountId, new BigDecimal("50.00"), "USD");
