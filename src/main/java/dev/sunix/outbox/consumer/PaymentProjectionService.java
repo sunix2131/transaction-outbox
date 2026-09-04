@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @Service
 public class PaymentProjectionService {
@@ -25,7 +26,7 @@ public class PaymentProjectionService {
         UUID paymentId = UUID.fromString(event.required("paymentId").stringValue());
         int inserted = jdbc.update(
                 "insert into processed_event (event_id, processed_at) values (?, ?) on conflict do nothing",
-                eventId, clock.instant());
+                eventId, Timestamp.from(clock.instant()));
         if (inserted == 0) {
             return false;
         }
@@ -41,7 +42,7 @@ public class PaymentProjectionService {
                 UUID.fromString(event.required("accountId").stringValue()),
                 new BigDecimal(event.required("amount").stringValue()),
                 event.required("currency").stringValue(),
-                Instant.parse(event.required("occurredAt").stringValue()));
+                Timestamp.from(Instant.parse(event.required("occurredAt").stringValue())));
         return true;
     }
 }

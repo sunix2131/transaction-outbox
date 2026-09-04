@@ -3,6 +3,7 @@ package dev.sunix.outbox.payment;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class PaymentRepository {
                     (id, idempotency_key, request_hash, account_id, amount, currency, status, created_at)
                 values (?, ?, ?, ?, ?, ?, 'ACCEPTED', ?)
                 """,
-                id, idempotencyKey, requestHash, accountId, amount, currency, createdAt);
+                id, idempotencyKey, requestHash, accountId, amount, currency, Timestamp.from(createdAt));
     }
 
     private static PaymentRecord map(ResultSet rs, int row) throws SQLException {

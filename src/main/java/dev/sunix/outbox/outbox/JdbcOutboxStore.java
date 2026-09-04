@@ -2,6 +2,7 @@ package dev.sunix.outbox.outbox;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +25,8 @@ public class JdbcOutboxStore implements OutboxStore {
                     (id, aggregate_type, aggregate_id, event_type, payload, created_at, available_at)
                 values (?, ?, ?, ?, cast(? as jsonb), ?, ?)
                 """,
-                id, aggregateType, aggregateId, eventType, payload, createdAt, createdAt);
+                id, aggregateType, aggregateId, eventType, payload,
+                Timestamp.from(createdAt), Timestamp.from(createdAt));
     }
 
     @Override
@@ -44,12 +46,12 @@ public class JdbcOutboxStore implements OutboxStore {
 
     @Override
     public void markPublished(UUID id, Instant publishedAt) {
-        jdbc.update("update outbox_event set status = 'PUBLISHED', published_at = ?, last_error = null where id = ? and status = 'PENDING'", publishedAt, id);
+        jdbc.update("update outbox_event set status = 'PUBLISHED', published_at = ?, last_error = null where id = ? and status = 'PENDING'", Timestamp.from(publishedAt), id);
     }
 
     @Override
     public void scheduleRetry(UUID id, int attempts, Instant availableAt, String error) {
-        jdbc.update("update outbox_event set attempts = ?, available_at = ?, last_error = ? where id = ? and status = 'PENDING'", attempts, availableAt, error, id);
+        jdbc.update("update outbox_event set attempts = ?, available_at = ?, last_error = ? where id = ? and status = 'PENDING'", attempts, Timestamp.from(availableAt), error, id);
     }
 
     @Override
@@ -64,4 +66,3 @@ public class JdbcOutboxStore implements OutboxStore {
                 rs.getTimestamp("created_at").toInstant());
     }
 }
-
