@@ -1,4 +1,4 @@
-# transaction-outbox
+# EventRelay
 
 This service accepts a payment command, stores the payment and its integration event in one PostgreSQL transaction, and publishes committed outbox rows to Kafka.
 

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: transaction-outbox
+    name: eventrelay
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/outbox}
     username: ${DATABASE_USER:outbox}
@@ -23,4 +23,3 @@ app:
     max-attempts: 8
     poll-interval: 500ms
     send-timeout: 5s
-
